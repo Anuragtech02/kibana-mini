@@ -135,7 +135,11 @@ async def query(body: QueryBody):
     )
 
 
-@app.get("/columns", tags=['Meta'])
+class ColumnList(BaseModel):
+    columns: List[str]
+
+
+@app.get("/columns", tags=['Meta'], response_model=ColumnList)
 async def list_columns():
     return {
         "columns": df.columns.values.tolist()
