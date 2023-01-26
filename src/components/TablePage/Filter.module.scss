@@ -48,3 +48,22 @@
         }
     }
 }
+.valueInput{
+    width: 150px;
+}
+.filterList{
+    li{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: baseline;
+        gap:15px;
+        margin: 5px;
+        span{
+            border: 1px solid rgba(184, 184, 241, 0.463);
+            padding: 5px 10px;
+            border-radius: 5px;
+            background-color: #EEF1FF;
+        }
+    }
+}

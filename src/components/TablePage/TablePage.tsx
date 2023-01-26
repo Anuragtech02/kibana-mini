@@ -1,5 +1,5 @@
 import { Table } from "antd";
-import React from "react";
+import React, { useEffect } from "react";
 import styles from "./TablePage.module.scss";
 import { Filter } from "./Filter";
 type Props = {
@@ -8,6 +8,11 @@ type Props = {
 };
 
 export default function TablePage({ formData, setSubmittedForm }: Props) {
+  const [filters, setFilters] = React.useState([]);
+  const [sort, setSorting] = React.useState([]);
+  useEffect(() => {
+    console.log(filters, sort);
+  }, [sort, filters]);
   return (
     <div className={styles.tablepage}>
       <div className={styles.navbar}>
@@ -26,7 +31,12 @@ export default function TablePage({ formData, setSubmittedForm }: Props) {
           Change
         </button>
       </div>
-      <Filter />
+      <Filter
+        filters={filters}
+        setFilters={setFilters}
+        setSorting={setSorting}
+        sort={sort}
+      />
       <Table />
     </div>
   );
