@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel
-from typing import List, Any
+from typing import List, Any, Optional
 from enum import Enum
 import pandas
 import datetime
@@ -37,7 +37,7 @@ class SortModel(BaseModel):
 class QueryBody(BaseModel):
     columns: List[str]
     filters: List[FilterModel]
-    sort: SortModel
+    sort: Optional[SortModel]
     skip: int
     limit: int
 
@@ -71,7 +71,10 @@ async def query(body: QueryBody):
 
     resultant_df = df
 
-    combined_columns_list = body.columns + [i.column for i in body.filters] + [body.sort.column]
+    combined_columns_list = body.columns + [i.column for i in body.filters]
+    if body.sort is not None:
+        combined_columns_list.append(body.sort.column)
+
     for i in combined_columns_list:
         if i not in df.columns.values.tolist():
             raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=f"Invalid column: {i}")  
@@ -120,7 +123,9 @@ async def query(body: QueryBody):
 
 
     resultant_df = resultant_df[body.columns]
-    resultant_df = resultant_df.sort_values(by=[body.sort.column], ascending=body.sort.asc)
+
+    if body.sort is not None:
+        resultant_df = resultant_df.sort_values(by=[body.sort.column], ascending=body.sort.asc)
 
 
     end = datetime.datetime.now()
