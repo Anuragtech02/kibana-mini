@@ -133,3 +133,10 @@ async def query(body: QueryBody):
         records=resultant_df.to_dict(orient="records"),
         next=False
     )
+
+
+@app.get("/columns", tags=['Meta'])
+async def list_columns():
+    return {
+        "columns": df.columns.values.tolist()
+    }
