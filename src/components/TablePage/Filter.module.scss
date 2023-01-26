@@ -1,0 +1,50 @@
+.filterContainer{
+    padding:25px 50px;
+    background-color:#EEF1FF;
+    .collapse{
+        font-size: 16px;
+            box-shadow: 2px 2px 10px rgb(155, 155, 244);
+            button {
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: center;
+                    align-items: center;
+                    border: none;
+                    cursor: pointer;
+                    background-color: white;
+                    border-radius: 100%;
+                    padding: 5px;
+                    transition: 200ms ease-in-out;
+            
+                    &:hover {
+                        scale: 1.1;
+                        background-color: rgba(184, 184, 241, 0.463);
+                        color: white;
+                    }
+                }
+    }
+}
+.filterForm{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: baseline;
+    gap:15px;
+    button{
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        border: none;
+        cursor: pointer;
+        background-color: white;
+        border-radius: 100%;
+        padding: 5px;
+        transition: 200ms ease-in-out;
+        &:hover{
+            scale: 1.1;
+            background-color: rgba(184, 184, 241, 0.463);
+            color: white;
+        }
+    }
+}
