@@ -1,20 +1,21 @@
-import { Table } from "antd";
-import React, { useEffect } from "react";
+import { Button, Card, Input, Table } from "antd";
+import React, { useEffect, useState } from "react";
 import styles from "./TablePage.module.scss";
 import { Filter } from "./Filter";
 import { columnForTable, columnValues } from "../../utils/dummyData";
-type Props = {
-  formData: any;
-  setSubmittedForm: any;
-};
+type Props = {};
+import { DatePicker, Space } from "antd";
 
-export default function TablePage({ formData, setSubmittedForm }: Props) {
-  const [filters, setFilters] = React.useState([]);
-  const [sort, setSorting] = React.useState({
-    column: "id",
-    filter: "sort",
-    value: "asc",
+const { RangePicker } = DatePicker;
+export default function TablePage({}: Props) {
+  const [formData, setFormData] = useState({
+    name: "",
+    from: "",
+    to: "",
   });
+
+  const [filters, setFilters] = React.useState([]);
+  const [sort, setSorting] = React.useState<any>(null);
   const [tableData, setTableData] = React.useState([]);
   const fetchTableData = () => {
     const modifiedFilters = filters.map((item: any) => {
@@ -24,10 +25,13 @@ export default function TablePage({ formData, setSubmittedForm }: Props) {
         column: item.column,
       };
     });
-    const modifiedSort = {
-      column: sort.column,
-      asc: sort.value === "asc",
-    };
+
+    let modifiedSort = null;
+    if (sort?.column && sort?.value)
+      modifiedSort = {
+        column: sort?.column,
+        asc: sort?.value === "asc",
+      };
     const body = {
       columns: columnValues,
       filters: modifiedFilters,
@@ -52,37 +56,52 @@ export default function TablePage({ formData, setSubmittedForm }: Props) {
   useEffect(() => {
     fetchTableData();
   }, [sort, filters]);
+  const changeHandler = (e: any) => {
+    console.log(e);
+    setFormData((prev: any) => {
+      return { ...prev, [e.target.name]: e.target.value };
+    });
+  };
   return (
     <div className={styles.tablepage}>
-      <div className={styles.navbar}>
-        {Object.entries(formData).map((item: any) => {
-          return (
-            <div>
-              {item[0]}: {item[1]}
-            </div>
-          );
-        })}
-        <button
-          onClick={() => {
-            setSubmittedForm(false);
-          }}
-        >
-          Change
-        </button>
-      </div>
+      <Card title="Details">
+        <div className={styles.navbar}>
+          <div className={styles.inputContainer}>
+            <Input
+              onChange={changeHandler}
+              required={true}
+              placeholder="Enter Name"
+              value={formData.name}
+              name="name"
+            />
+
+            <RangePicker
+              onChange={(e, d) => {
+                console.log(e, d);
+                setFormData((prev: any) => {
+                  return { ...prev, from: d[0], to: d[1] };
+                });
+              }}
+            />
+          </div>
+          <Button onClick={fetchTableData} type="primary">
+            Submit
+          </Button>
+        </div>
+      </Card>
       <Filter
         filters={filters}
         setFilters={setFilters}
         setSorting={setSorting}
         sort={sort}
       />
-      <div style={{ padding: "25px" }}>
+      <Card>
         <Table
           columns={columnForTable}
           dataSource={tableData}
           pagination={false}
         />
-      </div>
+      </Card>
     </div>
   );
 }

@@ -1,6 +1,11 @@
-import React from "react";
-import { CaretRightOutlined } from "@ant-design/icons";
-import { Collapse, DatePicker, theme } from "antd";
+import React, { useState } from "react";
+import {
+  CaretRightOutlined,
+  CheckCircleOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
+import { Button, Collapse, DatePicker, Divider, Tag, theme } from "antd";
 import styles from "./Filter.module.scss";
 const { Panel } = Collapse;
 import addIcon from "../../assets/106230_add_icon.svg";
@@ -58,7 +63,7 @@ export const Filter = ({ filters, setFilters, sort, setSorting }: Props) => {
     //   const newSort = sort.filter((item) => item !== value);
     //   return setSorting(newSort);
     // }
-    const newFilters = filters.filter((item) => item !== value);
+    const newFilters = filters.filter((item: any) => item !== value);
     setFilters(newFilters);
   };
   return (
@@ -73,10 +78,9 @@ export const Filter = ({ filters, setFilters, sort, setSorting }: Props) => {
         style={{ background: token.colorBgContainer }}
       >
         <Panel header="Filter" key="1" style={panelStyle}>
-          <p>Filter</p>
           <ul className={styles.filterList}>
             {filters?.length !== 0 &&
-              filters?.map((filter, index) => (
+              filters?.map((filter: any, index: number) => (
                 <FilterItem
                   onDelete={filterDeleteHandler}
                   key={index}
@@ -84,12 +88,16 @@ export const Filter = ({ filters, setFilters, sort, setSorting }: Props) => {
                 />
               ))}
 
-            <FilterItem onDelete={filterDeleteHandler} value={sort} />
+            {sort && <FilterItem onDelete={filterDeleteHandler} value={sort} />}
           </ul>
           {!showFilterForm && (
-            <button onClick={() => setShowFilterForm(true)}>
-              <img src={addIcon} alt="add" height={25} width={25} />
-            </button>
+            <Button
+              type="dashed"
+              icon={<PlusOutlined />}
+              onClick={() => setShowFilterForm(true)}
+            >
+              New Filter
+            </Button>
           )}
           {showFilterForm && (
             <FilterForm columns={[]} onSubmit={filterFormHandler} />
@@ -109,16 +117,41 @@ const FilterItem = ({
   const handleDelete = () => {
     onDelete(value);
   };
+  //function to genereate random dark color hex code
+
+  const getRandomColor = () => {
+    const letters = "0123456789ABCDEF";
+    let color = "#";
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  };
+  const [color, setColor] = useState(getRandomColor());
+  const handleColorChange = (event: any) => {
+    console.log(event.target.value);
+    setColor(event.target.value);
+  };
   return (
-    <li>
-      <span>{value.column}</span>
-      <span>{value.filter}</span>
-      {value?.value && <span>{value.value}</span>}
-      {value.filter !== "sort" && (
-        <button onClick={handleDelete}>
-          <img src={deleteIcon} alt="add" height={25} width={25} />
-        </button>
-      )}
+    <li style={{ background: `${color}10`, borderColor: `${color}20` }}>
+      <input
+        value={color}
+        className={styles.colorInput}
+        type="color"
+        onChange={handleColorChange}
+      />
+      <div className={styles.filterTags}>
+        <Tag color={color}>{value.column}</Tag>
+        <Tag color={color}>{value.filter}</Tag>
+        {value?.value && <Tag color={color}>{value.value}</Tag>}
+        {value.filter !== "sort" && (
+          <Button
+            icon={<DeleteOutlined />}
+            type="text"
+            onClick={handleDelete}
+          ></Button>
+        )}
+      </div>
     </li>
   );
 };
@@ -183,6 +216,11 @@ const FilterForm = ({
         placeholder="Select Column"
         options={columnValuesWithTypes}
       />
+      <Divider
+        type="horizontal"
+        dashed
+        style={{ minWidth: "10px", width: "30px" }}
+      />
       <Select
         id="filter"
         defaultValue="select filter"
@@ -190,6 +228,11 @@ const FilterForm = ({
         onChange={handleFilterChange}
         placeholder="Select Filter"
         options={filtersValues}
+      />
+      <Divider
+        type="horizontal"
+        dashed
+        style={{ minWidth: "10px", width: "30px" }}
       />
       {isValueRequired() && !isDateRequired() && (
         <Input
@@ -203,6 +246,7 @@ const FilterForm = ({
           placeholder="Enter Value"
         />
       )}
+
       {isSelectRequired() && !isDateRequired() && (
         <Select
           id="value"
@@ -224,9 +268,12 @@ const FilterForm = ({
           }}
         />
       )}
-      <button onClick={handleSubmit}>
-        <img src={tickIcon} alt="add" height={25} width={25} />
-      </button>
+
+      <Button
+        type="text"
+        icon={<CheckCircleOutlined />}
+        onClick={handleSubmit}
+      ></Button>
     </div>
   );
 };

@@ -1,38 +1,18 @@
 .navbar{
-    background-color:#EEF1FF;
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
-    padding: 15px;
+    justify-content: space-between;
     align-items: center;
-    div{
-        border-radius: 3px;
-        padding: 5px 25px;
-        background-color: white;
-        font-size: 18px;
-    }
-        button {
-            border: none;
-            outline: none;
-            font-size: 18px;
-            padding: 10px 25px;
-            border-radius: 6px;
-            background-color: rgb(155, 155, 244);
-            color: white;
-            cursor: pointer;
-            border: 1px solid transparent;
-            transition: 500ms ease-in-out;
-    
-            &:hover {
-                scale: 5px;
-                box-shadow: 6px 6px 10px rgb(155, 155, 244);
-                background-color: white;
-                border: 1px solid rgb(155, 155, 244);
-                color: rgb(155, 155, 244);
-            }
-        }
+ 
 }
 .tablepage{
     height: 100%;
-    background: #EEF1FF;
+    max-width: 1200px;
+    margin: 0 auto;
+    .inputContainer{
+        display:flex;
+        justify-content: flex-start;
+        align-items: center;
+        gap:1rem;
+    }
 }

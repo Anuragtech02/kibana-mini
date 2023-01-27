@@ -3,6 +3,8 @@ import React from "react";
 type Props = { setFormData: any; formData: any; onSubmit: () => void };
 import styles from "./Form.module.scss";
 import { DatePicker } from "antd";
+import { Input } from "antd";
+
 export default function Form({ setFormData, formData, onSubmit }: Props) {
   const changeHandler = (e: any) => {
     console.log(e);
@@ -29,6 +31,12 @@ export default function Form({ setFormData, formData, onSubmit }: Props) {
             onChange={changeHandler}
             required={true}
           />
+          {/* <Input
+            onChange={changeHandler}
+            required={true}
+            placeholder="Enter Name"
+            value={formData.name}
+          /> */}
         </div>
         <div>
           <DatePicker
