@@ -76,6 +76,7 @@ export default function TablePage({}: Props) {
             />
 
             <RangePicker
+              style={{ minWidth: "300px" }}
               onChange={(e, d) => {
                 console.log(e, d);
                 setFormData((prev: any) => {
