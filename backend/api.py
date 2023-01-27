@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel
-from typing import List, Any, Optional
+from typing import List, Any, Optional, Literal
 from enum import Enum
 import pandas
 import datetime
@@ -156,11 +156,15 @@ async def query(body: QueryBody):
 
 
 class ColumnList(BaseModel):
-    columns: List[str]
+    column: str
+    datatype: str
 
 
-@app.get("/columns", tags=['Meta'], response_model=ColumnList)
+@app.get("/columns", tags=['Meta'], response_model=List[ColumnList])
 async def list_columns():
-    return {
-        "columns": df.columns.values.tolist()
-    }
+    columns_list = []
+    for i in df.columns.values.tolist():
+        typ = str(df[i].dtype).replace('64[ns]', '').replace('float64', 'number').replace('object', 'str')
+        columns_list.append(ColumnList(column=i, datatype=typ))
+
+    return columns_list
