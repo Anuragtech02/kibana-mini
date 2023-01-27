@@ -4,6 +4,10 @@ from typing import List, Any, Optional
 from enum import Enum
 import pandas
 import datetime
+from fastapi.middleware.cors import CORSMiddleware
+
+
+
 
 class FilterTypes(str, Enum):
     not_null = "not_null"
@@ -52,7 +56,18 @@ class QueryResponse(BaseModel):
     next: bool
 
 app = FastAPI()
+origins = [
+    
+    '*'
+]
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["OPTIONS", "GET", "POST"],
+    allow_headers=["*"],
+)
 records = [
     {"id": "abc-123", "title": "creation", "type": "documentary", "score": 4.5, "release": datetime.datetime(year=2022, month=12, day=3, hour=3, minute=36)},
     {"id": "abd-153", "title": "toy", "type": "thriller", "score": 3.5, "release": datetime.datetime(year=2022, month=11, day=5, hour=13, minute=36)},

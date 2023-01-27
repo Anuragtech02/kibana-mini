@@ -2,6 +2,7 @@ import { Table } from "antd";
 import React, { useEffect } from "react";
 import styles from "./TablePage.module.scss";
 import { Filter } from "./Filter";
+import { columnForTable, columnValues } from "../../utils/dummyData";
 type Props = {
   formData: any;
   setSubmittedForm: any;
@@ -9,9 +10,47 @@ type Props = {
 
 export default function TablePage({ formData, setSubmittedForm }: Props) {
   const [filters, setFilters] = React.useState([]);
-  const [sort, setSorting] = React.useState([]);
+  const [sort, setSorting] = React.useState({
+    column: "id",
+    filter: "sort",
+    value: "asc",
+  });
+  const [tableData, setTableData] = React.useState([]);
+  const fetchTableData = () => {
+    const modifiedFilters = filters.map((item: any) => {
+      return {
+        cond: item.filter,
+        value: item.value,
+        column: item.column,
+      };
+    });
+    const modifiedSort = {
+      column: sort.column,
+      asc: sort.value === "asc",
+    };
+    const body = {
+      columns: columnValues,
+      filters: modifiedFilters,
+      sort: modifiedSort,
+      skip: 0,
+      limit: 0,
+    };
+    fetch("http://localhost:8000/query", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    })
+      .then((res) => res.json())
+      .then((data) => setTableData(data.records))
+      .catch((err) => console.log(err));
+  };
   useEffect(() => {
-    console.log(filters, sort);
+    fetchTableData();
+  }, []);
+  useEffect(() => {
+    fetchTableData();
   }, [sort, filters]);
   return (
     <div className={styles.tablepage}>
@@ -37,7 +76,13 @@ export default function TablePage({ formData, setSubmittedForm }: Props) {
         setSorting={setSorting}
         sort={sort}
       />
-      <Table />
+      <div style={{ padding: "25px" }}>
+        <Table
+          columns={columnForTable}
+          dataSource={tableData}
+          pagination={false}
+        />
+      </div>
     </div>
   );
 }

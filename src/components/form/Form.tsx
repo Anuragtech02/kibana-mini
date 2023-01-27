@@ -2,8 +2,10 @@ import React from "react";
 
 type Props = { setFormData: any; formData: any; onSubmit: () => void };
 import styles from "./Form.module.scss";
+import { DatePicker } from "antd";
 export default function Form({ setFormData, formData, onSubmit }: Props) {
   const changeHandler = (e: any) => {
+    console.log(e);
     setFormData((prev: any) => {
       return { ...prev, [e.target.name]: e.target.value };
     });
@@ -29,21 +31,25 @@ export default function Form({ setFormData, formData, onSubmit }: Props) {
           />
         </div>
         <div>
-          <input
-            type="number"
-            name="from"
-            placeholder="from"
-            value={formData.from}
-            onChange={changeHandler}
-            required={true}
+          <DatePicker
+            onChange={(e, d) =>
+              changeHandler({
+                target: {
+                  name: "from",
+                  value: d,
+                },
+              })
+            }
           />
-          <input
-            type="number"
-            name="to"
-            placeholder="to"
-            value={formData.to}
-            onChange={changeHandler}
-            required={true}
+          <DatePicker
+            onChange={(e, d) =>
+              changeHandler({
+                target: {
+                  name: "to",
+                  value: d,
+                },
+              })
+            }
           />
         </div>
         <button>Submit</button>

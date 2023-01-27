@@ -1,6 +1,6 @@
 import React from "react";
 import { CaretRightOutlined } from "@ant-design/icons";
-import { Collapse, theme } from "antd";
+import { Collapse, DatePicker, theme } from "antd";
 import styles from "./Filter.module.scss";
 const { Panel } = Collapse;
 import addIcon from "../../assets/106230_add_icon.svg";
@@ -9,7 +9,7 @@ import deleteIcon from "../../assets/delete.svg";
 import { Select } from "antd";
 
 import { Input } from "antd";
-
+import { filtersValues, columnValuesWithTypes } from "../../utils/dummyData";
 type Props = {
   filters: any;
   setFilters: any;
@@ -30,14 +30,11 @@ export const Filter = ({ filters, setFilters, sort, setSorting }: Props) => {
     console.log(values);
     setShowFilterForm(false);
     if (values.filter === "sort") {
-      let alreadyExists = sort.findIndex(
-        (item: any) => item.column === values.column
-      );
-      if (alreadyExists === -1) {
-        return setSorting([...sort, values]);
-      }
-      const newSort = sort.filter((item) => item.column !== values.column);
-      setSorting([...newSort, values]);
+      setSorting({
+        column: values.column,
+        filter: "sort",
+        value: values.value,
+      });
       return;
     }
     let alreadyExists = filters.findIndex(
@@ -57,10 +54,10 @@ export const Filter = ({ filters, setFilters, sort, setSorting }: Props) => {
     console.log(filters);
   };
   const filterDeleteHandler = (value: any) => {
-    if (value.filter === "sort") {
-      const newSort = sort.filter((item) => item !== value);
-      return setSorting(newSort);
-    }
+    // if (value.filter === "sort") {
+    //   const newSort = sort.filter((item) => item !== value);
+    //   return setSorting(newSort);
+    // }
     const newFilters = filters.filter((item) => item !== value);
     setFilters(newFilters);
   };
@@ -86,14 +83,8 @@ export const Filter = ({ filters, setFilters, sort, setSorting }: Props) => {
                   value={filter}
                 />
               ))}
-            {sort?.length !== 0 &&
-              sort?.map((filter, index) => (
-                <FilterItem
-                  onDelete={filterDeleteHandler}
-                  key={index}
-                  value={filter}
-                />
-              ))}
+
+            <FilterItem onDelete={filterDeleteHandler} value={sort} />
           </ul>
           {!showFilterForm && (
             <button onClick={() => setShowFilterForm(true)}>
@@ -123,9 +114,11 @@ const FilterItem = ({
       <span>{value.column}</span>
       <span>{value.filter}</span>
       {value?.value && <span>{value.value}</span>}
-      <button onClick={handleDelete}>
-        <img src={deleteIcon} alt="add" height={25} width={25} />
-      </button>
+      {value.filter !== "sort" && (
+        <button onClick={handleDelete}>
+          <img src={deleteIcon} alt="add" height={25} width={25} />
+        </button>
+      )}
     </li>
   );
 };
@@ -162,80 +155,7 @@ const FilterForm = ({
     }
     onSubmit({ column, filter, value });
   };
-  const filtersValues = [
-    {
-      label: "not_null",
-      value: "not_null",
-    },
-    {
-      label: "null",
-      value: "null",
-    },
-    {
-      label: "text_contains",
-      value: "text_contains",
-    },
-    {
-      label: "text_not_contains",
-      value: "text_not_contains",
-    },
-    {
-      label: "text_starts_with",
-      value: "text_starts_with",
-    },
-    {
-      label: "text_ends_with",
-      value: "text_ends_with",
-    },
-    {
-      label: "text_equals",
-      value: "text_equals",
-    },
-    {
-      label: "greater_than",
-      value: "greater_than",
-    },
-    {
-      label: "greater_than_equal",
-      value: "greater_than_equal",
-    },
-    {
-      label: "less_than",
-      value: "less_than",
-    },
-    {
-      label: "less_than_equal",
-      value: "less_than_equal",
-    },
-    {
-      label: "equal",
-      value: "equal",
-    },
-    {
-      label: "not_equal",
-      value: "not_equal",
-    },
-    {
-      label: "is_between",
-      value: "is_between",
-    },
-    {
-      label: "date_is",
-      value: "date_is",
-    },
-    {
-      label: "date_greater_than",
-      value: "date_greater_than",
-    },
-    {
-      label: "date_less_than",
-      value: "date_less_than",
-    },
-    {
-      label: "sort",
-      value: "sort",
-    },
-  ];
+
   const isValueRequired = () => {
     if (filter === "not_null" || filter === "null" || filter === "sort") {
       return false;
@@ -248,6 +168,11 @@ const FilterForm = ({
     }
     return false;
   };
+  const isDateRequired = () => {
+    if (filter.startsWith("date")) {
+      return true;
+    }
+  };
   return (
     <div className={styles.filterForm}>
       <Select
@@ -256,11 +181,7 @@ const FilterForm = ({
         style={{ width: 120 }}
         onChange={handleColumnChange}
         placeholder="Select Column"
-        options={[
-          { value: "col1", label: "Col1" },
-          { value: "col2", label: "Col2" },
-          { value: "col3", label: "Col3" },
-        ]}
+        options={columnValuesWithTypes}
       />
       <Select
         id="filter"
@@ -270,7 +191,7 @@ const FilterForm = ({
         placeholder="Select Filter"
         options={filtersValues}
       />
-      {isValueRequired() && (
+      {isValueRequired() && !isDateRequired() && (
         <Input
           id="value"
           onChange={(e) => {
@@ -282,7 +203,7 @@ const FilterForm = ({
           placeholder="Enter Value"
         />
       )}
-      {isSelectRequired() && (
+      {isSelectRequired() && !isDateRequired() && (
         <Select
           id="value"
           defaultValue="select value"
@@ -295,7 +216,14 @@ const FilterForm = ({
           ]}
         />
       )}
-
+      {isDateRequired() && (
+        <DatePicker
+          onChange={(e, d) => {
+            console.log(e, d);
+            setValue(d);
+          }}
+        />
+      )}
       <button onClick={handleSubmit}>
         <img src={tickIcon} alt="add" height={25} width={25} />
       </button>
