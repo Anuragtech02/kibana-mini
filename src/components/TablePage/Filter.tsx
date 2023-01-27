@@ -70,12 +70,10 @@ export const Filter = ({ filters, setFilters, sort, setSorting }: Props) => {
     <div className={styles.filterContainer}>
       <Collapse
         className={styles.collapse}
-        bordered={false}
         defaultActiveKey={["1"]}
         expandIcon={({ isActive }) => (
           <CaretRightOutlined rotate={isActive ? 90 : 0} />
         )}
-        style={{ background: token.colorBgContainer }}
       >
         <Panel header="Filter" key="1" style={panelStyle}>
           <ul className={styles.filterList}>
