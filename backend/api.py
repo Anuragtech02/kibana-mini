@@ -57,7 +57,6 @@ class QueryResponse(BaseModel):
 
 app = FastAPI()
 origins = [
-    
     '*'
 ]
 

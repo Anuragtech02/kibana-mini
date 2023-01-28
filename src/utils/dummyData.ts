@@ -1,8 +1,4 @@
-export const filtersValues = [
-  {
-    label: "sort",
-    value: "sort",
-  },
+export const filtersStringValues = [
   {
     label: "not_null",
     value: "not_null",
@@ -31,6 +27,22 @@ export const filtersValues = [
     label: "text_equals",
     value: "text_equals",
   },
+];
+export const filtersDateValues = [
+  {
+    label: "date_is",
+    value: "date_is",
+  },
+  {
+    label: "date_greater_than",
+    value: "date_greater_than",
+  },
+  {
+    label: "date_less_than",
+    value: "date_less_than",
+  },
+];
+export const filtersNumberValues = [
   {
     label: "greater_than",
     value: "greater_than",
@@ -54,19 +66,6 @@ export const filtersValues = [
   {
     label: "not_equal",
     value: "not_equal",
-  },
-
-  {
-    label: "date_is",
-    value: "date_is",
-  },
-  {
-    label: "date_greater_than",
-    value: "date_greater_than",
-  },
-  {
-    label: "date_less_than",
-    value: "date_less_than",
   },
 ];
 
