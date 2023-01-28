@@ -7,6 +7,7 @@ COPY ./requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
 
 COPY ./api.py /app/api.py
+COPY ./Car_sales.csv /app/Car_sales.csv
 
 EXPOSE 8000
 

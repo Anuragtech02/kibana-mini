@@ -68,16 +68,8 @@ app.add_middleware(
     allow_methods=["OPTIONS", "GET", "POST"],
     allow_headers=["*"],
 )
-records = [
-    {"id": "abc-123", "title": "creation", "type": "documentary", "score": 4.5, "release": datetime.datetime(year=2022, month=12, day=3, hour=3, minute=36)},
-    {"id": "abd-153", "title": "toy", "type": "thriller", "score": 3.5, "release": datetime.datetime(year=2022, month=11, day=5, hour=13, minute=36)},
-    {"id": "abe-163", "title": "cars", "type": "documentary", "score": 4.6, "release": datetime.datetime(year=2022, month=12, day=13, hour=3, minute=36)},
-    {"id": "abf-143", "title": "pixar", "type": "sci-fi", "score": 4.2, "release": datetime.datetime(year=2022, month=12, day=23, hour=23, minute=36)},
-    {"id": "abg-133", "title": "beast", "type": "animation", "score": 4.5, "release": datetime.datetime(year=2022, month=10, day=2, hour=3, minute=36)},
-    {"id": "abh-173", "title": "avatar", "type": "documentary", "score": 4.5, "release": datetime.datetime(year=2022, month=12, day=3, hour=4, minute=36)}
-]
 
-df = pandas.DataFrame(records)
+df = pandas.read_csv('Car_sales.csv')
 
 
 @app.post("/query", response_model=QueryResponse, tags=["API"])
