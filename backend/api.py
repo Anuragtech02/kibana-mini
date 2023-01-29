@@ -141,7 +141,7 @@ async def query(body: QueryBody):
         transcation=TranscationModel(
             time=delta.microseconds/10**6, record_count=len(resultant_df)
         ),
-        records=resultant_df.to_dict(orient="records"),
+        records=resultant_df.fillna('').to_dict(orient="records"),
         next=False
     )
 
