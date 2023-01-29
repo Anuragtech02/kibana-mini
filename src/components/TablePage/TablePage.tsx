@@ -7,6 +7,7 @@ type Props = {};
 import { DatePicker, Space } from "antd";
 import { Sort } from "./Sort";
 import { columnValuesWithTypes } from "./../../utils/dummyData";
+import VirtualTable from "../VirtualTable/VirtualTable";
 
 const { RangePicker } = DatePicker;
 export default function TablePage({}: Props) {
@@ -21,8 +22,11 @@ export default function TablePage({}: Props) {
   const [tableData, setTableData] = React.useState([]);
   const [columns, setColumns] = React.useState([]);
   const [columnValues, setColumnValues] = React.useState([]);
+  const [recordCount, setRecordCount] = React.useState(0);
+  const [loading, setLoading] = React.useState(false);
+  const [timeTake, setTimeTake] = React.useState(0);
   const fetchTableData = () => {
-    const modifiedColumns = columns.map((item: any) => {
+    const modifiedColumns = columnValues.map((item: any) => {
       return item.column;
     });
     const modifiedFilters = filters.map((item: any) => {
@@ -46,6 +50,7 @@ export default function TablePage({}: Props) {
       skip: 0,
       limit: 0,
     };
+    setLoading(true);
     fetch("http://localhost:8000/query", {
       method: "POST",
       headers: {
@@ -54,10 +59,19 @@ export default function TablePage({}: Props) {
       body: JSON.stringify(body),
     })
       .then((res) => res.json())
-      .then((data) => setTableData(data.records))
-      .catch((err) => console.log(err));
+      .then((data) => {
+        setLoading(false);
+        setTableData(data.records);
+        setRecordCount(data.transcation.record_count);
+        setTimeTake(data.transcation.time);
+      })
+      .catch((err) => {
+        setLoading(false);
+        console.log(err);
+      });
   };
   const fetchColumnValues = () => {
+    setLoading(true);
     fetch("http://localhost:8000/columns", {
       method: "GET",
       headers: {
@@ -68,8 +82,12 @@ export default function TablePage({}: Props) {
       .then((data) => {
         setColumns(data);
         setColumnValues(data);
+        setLoading(false);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        setLoading(false);
+        console.log(err);
+      });
   };
   useEffect(() => {
     fetchColumnValues();
@@ -81,7 +99,7 @@ export default function TablePage({}: Props) {
   useEffect(() => {
     fetchTableData();
     console.log(filters, sort);
-  }, [sort, filters]);
+  }, [sort, filters, columnValues]);
   const changeHandler = (e: any) => {
     console.log(e);
     setFormData((prev: any) => {
@@ -95,11 +113,17 @@ export default function TablePage({}: Props) {
     });
     setColumnValues(modifiedColumns);
   };
+  const getWidth = (column: string) => {
+    const calculatedWidth = column.length * 10;
+    if (calculatedWidth < 120) return 120;
+    return calculatedWidth;
+  };
   const columnForTable = columnValues.map((item: any) => {
     return {
       title: item.column,
       dataIndex: item.column,
       key: item.column,
+      width: getWidth(item.column),
     };
   });
   return (
@@ -146,7 +170,32 @@ export default function TablePage({}: Props) {
         <Sort columns={columnValues} setSorting={setSorting} sort={sort} />
       </div>
       <Card>
-        <p style={{ marginLeft: "3px" }}>Select Columns</p>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <p style={{ marginLeft: "3px" }}>
+            <b>Select Columns</b>
+          </p>
+          <span
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              gap: "15px",
+            }}
+          >
+            <p>
+              <b>Record Count:</b> {recordCount}
+            </p>
+            <p>
+              <b>Time Taken:</b> {timeTake} s
+            </p>
+          </span>
+        </div>
         <Select
           mode="tags"
           style={{ width: "100%", marginTop: "15px" }}
@@ -162,8 +211,9 @@ export default function TablePage({}: Props) {
           }))}
         />
         <Divider />
-        <Table
-          scroll={{ x: 1000 }}
+        <VirtualTable
+          loading={loading}
+          scroll={{ y: 500 }}
           columns={columnForTable}
           dataSource={tableData}
           pagination={false}

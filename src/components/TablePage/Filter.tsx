@@ -84,6 +84,7 @@ export const Filter = ({ filters, setFilters, columns }: Props) => {
     // }
     const newFilters = localFilters.filter((item: any) => item !== value);
     setLocalFilters(newFilters);
+    setButtonStatus(false);
   };
   return (
     <div className={styles.filterContainer}>
@@ -139,7 +140,7 @@ export const Filter = ({ filters, setFilters, columns }: Props) => {
             {showFilterForm && (
               <FilterForm columns={columns} onSubmit={filterChangeHandler} />
             )}
-            {localFilters.length > 0 && (
+            {(localFilters.length > 0 || !buttonStatus) && (
               <div style={{ marginTop: "15px" }}>
                 <Button
                   disabled={buttonStatus}

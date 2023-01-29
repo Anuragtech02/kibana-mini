@@ -20,3 +20,7 @@
   background: rgb(198, 198, 198);
   border-radius: 5px;
 }
+.virtual-table .ant-table-container:before,
+  .virtual-table .ant-table-container:after {
+    display: none;
+  }

@@ -50,8 +50,8 @@ export const Sort = ({ sort, setSorting, columns }: Props) => {
     //   const newSort = sort.filter((item) => item !== value);
     //   return setSorting(newSort);
     // }
-
-    setSorting(null);
+    setButtonStatus(false);
+    setLocalSort(null);
   };
   return (
     <div className={styles.filterContainer}>
@@ -102,7 +102,7 @@ export const Sort = ({ sort, setSorting, columns }: Props) => {
             {showFilterForm && (
               <SortForm columns={columns} onSubmit={filterChangeHandler} />
             )}
-            {localSort && (
+            {(localSort || !buttonStatus) && (
               <div style={{ marginTop: "15px" }}>
                 <Button
                   disabled={buttonStatus}
