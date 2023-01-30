@@ -1,6 +1,12 @@
 from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel
-from typing import List, Any, Optional, Literal
+from typing import List, Any, Optional
+
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
+
 from enum import Enum
 import pandas
 import datetime
