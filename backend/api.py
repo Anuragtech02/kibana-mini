@@ -54,6 +54,7 @@ class QueryResponse(BaseModel):
     transcation: TranscationModel
     records: List[dict]
     next: bool
+    prev: bool
 
 app = FastAPI()
 origins = [
@@ -133,6 +134,14 @@ async def query(body: QueryBody):
     if body.sort is not None:
         resultant_df = resultant_df.sort_values(by=[body.sort.column], ascending=body.sort.asc)
 
+    next = True
+    prev = False
+
+    if body.skip + body.limit > len(resultant_df):
+        next = False
+
+    if body.skip != 0:
+        prev = True
 
     end = datetime.datetime.now()
     delta = end - start
@@ -141,8 +150,9 @@ async def query(body: QueryBody):
         transcation=TranscationModel(
             time=delta.microseconds/10**6, record_count=len(resultant_df)
         ),
-        records=resultant_df.fillna('').to_dict(orient="records"),
-        next=False
+        records=resultant_df.fillna('').to_dict(orient="records")[body.skip:(body.limit + body.skip if body.limit is not None else None)],
+        next=next,
+        prev=prev
     )
 
 
