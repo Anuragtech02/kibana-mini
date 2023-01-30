@@ -21,10 +21,11 @@ export default function TablePage({}: Props) {
   const [sort, setSorting] = React.useState<any>(null);
   const [tableData, setTableData] = React.useState([]);
   const [columns, setColumns] = React.useState([]);
-  const [columnValues, setColumnValues] = React.useState([]);
+  const [columnValues, setColumnValues] = React.useState<any>([]);
   const [recordCount, setRecordCount] = React.useState(0);
   const [loading, setLoading] = React.useState(false);
   const [timeTake, setTimeTake] = React.useState(0);
+  const [limit, setLimit] = React.useState<any>(10);
   const fetchTableData = () => {
     const modifiedColumns = columnValues.map((item: any) => {
       return item.column;
@@ -48,10 +49,10 @@ export default function TablePage({}: Props) {
       filters: modifiedFilters,
       sort: modifiedSort,
       skip: 0,
-      limit: 0,
+      limit: limit,
     };
     setLoading(true);
-    fetch("http://localhost:8000/query", {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/query`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -61,7 +62,11 @@ export default function TablePage({}: Props) {
       .then((res) => res.json())
       .then((data) => {
         setLoading(false);
-        setTableData(data.records);
+        const modifiedRecords = data.records.map((item: any, index: number) => {
+          return { ...item, isLast: index === data.records.length - 1 };
+        });
+        setTableData(modifiedRecords);
+        console.log(modifiedRecords);
         setRecordCount(data.transcation.record_count);
         setTimeTake(data.transcation.time);
       })
@@ -72,7 +77,7 @@ export default function TablePage({}: Props) {
   };
   const fetchColumnValues = () => {
     setLoading(true);
-    fetch("http://localhost:8000/columns", {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/columns`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -95,7 +100,7 @@ export default function TablePage({}: Props) {
   useEffect(() => {
     fetchTableData();
     console.log(columns);
-  }, [columns]);
+  }, [columns, limit]);
   useEffect(() => {
     fetchTableData();
     console.log(filters, sort);
@@ -123,9 +128,45 @@ export default function TablePage({}: Props) {
       title: item.column,
       dataIndex: item.column,
       key: item.column,
-      width: getWidth(item.column),
+      width: 200,
+      render: (text: any, record: any) => {
+        console.log(text, record);
+        return (
+          <div style={{ background: "red" }} is-last={record.isLast}>
+            {text}
+          </div>
+        );
+      },
     };
   });
+  function atBottom(ele: any) {
+    var sh = ele.scrollHeight;
+    var st = ele.scrollTop;
+    var ht = ele.offsetHeight;
+    console.log({ sh, st, ht });
+    if (ht == 0) {
+      setLimit((prev: any) => prev + 10);
+      return true;
+    }
+    if (st - 8 == sh - ht) {
+      setLimit((prev: any) => prev + 10);
+      return true;
+    } else {
+      return false;
+    }
+  }
+  const ele = document.getElementsByClassName("custom-virtual-grid")[0];
+
+  useEffect(() => {
+    const scrollFetch = ele?.addEventListener("scroll", (e) => {
+      console.log(atBottom(ele));
+      console.log(e);
+    });
+    return () => {
+      //@ts-ignore
+      ele?.removeEventListener("scroll", scrollFetch, null);
+    };
+  }, [ele]);
   return (
     <div className={styles.tablepage}>
       <Card title="Details">
@@ -197,15 +238,12 @@ export default function TablePage({}: Props) {
           </span>
         </div>
         <Select
+          value={columnValues?.map((item: any) => item.column)}
           mode="tags"
           style={{ width: "100%", marginTop: "15px" }}
           placeholder="Tags Mode"
           onChange={handleColumnChange}
           options={columns?.map((item: any) => ({
-            label: item.column,
-            value: item.column,
-          }))}
-          value={columnValues?.map((item: any) => ({
             label: item.column,
             value: item.column,
           }))}
